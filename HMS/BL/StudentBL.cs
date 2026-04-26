@@ -12,20 +12,6 @@ namespace HMS.BL {
     class StudentBL
     {
         public StudentDL studentsDL = new StudentDL();
-        public int getroomnum(string regnumber)
-        {
-            Room room = studentsDL.getroom(regnumber);
-            if (room != null)
-                return room.getroomnum();
-            return 0;
-        }
-        public List<Student> getroommates(string regnumber)
-        {
-            Room room = studentsDL.getroom(regnumber);
-            if (room != null)
-                return room.getroommates();
-            return null;
-        }
         public static Student studentexist(string reg)
         {
             foreach (Student s in StudentDL.getstudents())
@@ -65,9 +51,9 @@ namespace HMS.BL {
         {
             return StudentDL.getstudents();
         }
-        public static void addsinglestudent(string regnum, string name, int sem)
+        public static void addsinglestudent(string regnum, string name, int sem, string pass)
         {
-            Student newStudent = new Student(regnum, name, sem);
+            Student newStudent = new Student(regnum, name, sem, pass);
 
             StudentDL.addstudent(newStudent);
         }
@@ -182,6 +168,17 @@ namespace HMS.BL {
             }
 
             return false;
+        }
+        public static Student VerifyStudentLogin(string reg, string password)
+        {
+            foreach (Student s in StudentDL.getstudents())
+            {
+                if (s.getid() == reg && s.getpass() == password)
+                {
+                    return s;
+                }
+            }
+            return null;
         }
     }
 }

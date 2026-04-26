@@ -57,6 +57,7 @@
     <Compile Include="Entities\Request.cs" />
     <Compile Include="Entities\Room.cs" />
     <Compile Include="Entities\Student.cs" />
+    <Compile Include="UI\MainUI.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DL\StudentDL.cs" />

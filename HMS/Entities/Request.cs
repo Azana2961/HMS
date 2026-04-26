@@ -9,8 +9,7 @@ namespace HMS.Entities
 {
     class Request
     {
-        static int requestcount = 1;
-        private int requestid = 0;
+        private int requestid;
         private string reason;
         private Student requestor;
         private string status;
@@ -23,16 +22,25 @@ namespace HMS.Entities
             reason = r;
             targetroom = troom;
             status = "Pending";
-            requestid = requestcount++;
             this.reqtype = reqtype;
         }
+
         public Request(Student s, string r, string reqt)
         {
             requestor = s;
             reason = r;
             status = "Pending";
-            requestid = requestcount++;
             reqtype = reqt;
+        }
+
+        public Request(int id, Student s, string r, int troom, string reqStatus, string reqtype)
+        {
+            requestid = id;
+            requestor = s;
+            reason = r;
+            targetroom = troom;
+            status = reqStatus;
+            this.reqtype = reqtype;
         }
         public int getrequestid()
         { return requestid; 

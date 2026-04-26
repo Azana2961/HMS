@@ -248,6 +248,11 @@ namespace HMS.UI
             Console.WriteLine("================================================================================\n");
             Console.ResetColor();
 
+            int currentLimit = RoomBL.getroommatelimit();
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine($"  [ Current Global Roommate Limit: {currentLimit} Students per Room ]\n");
+            Console.ResetColor();
+
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("  --- Update Room Capacity ---");
             Console.ResetColor();
@@ -479,6 +484,25 @@ namespace HMS.UI
                         Console.ResetColor();
                     }
                 }
+                string pass = "";
+                bool validPass = false;
+
+                while (!validPass)
+                {
+                    Console.Write("  Assign a password (min 8 chars, no spaces): ");
+                    pass = Console.ReadLine();
+
+                    if (ValidationBL.IsValidPassword(pass))
+                    {
+                        validPass = true;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("  [ERROR] Invalid password. Must be at least 8 characters with no spaces.\n");
+                        Console.ResetColor();
+                    }
+                }
 
                 int semester = 0;
                 bool validSem = false;
@@ -500,7 +524,7 @@ namespace HMS.UI
                     }
                 }
 
-                StudentBL.addsinglestudent(regNum, name, semester);
+                StudentBL.addsinglestudent(regNum, name, semester, pass);
             }
 
             Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -692,7 +716,7 @@ namespace HMS.UI
 
             foreach (Employee e in employees)
             {
-                if (e.getstatus() == true)
+                if (e.getstatus() == true && e.getrole()== "Front Desk")
                 Console.WriteLine(String.Format("  | {0,-20} | {1,-10} |", e.getname(), e.getemployeeid()));
             }
 

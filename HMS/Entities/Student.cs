@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,13 +12,15 @@ namespace HMS.Entities
         private string regnumber;
         private string name;
         private int semester;
+        private string password;
         private Room room;
-        public Student(string id, string name, int sem)
+        public Student(string id, string name, int sem, string pass)
         {
             regnumber = id;
             this.name = name;
             room = null;
             semester = sem;
+            password = pass;
         }
         public string getname()
         {
@@ -46,6 +49,14 @@ namespace HMS.Entities
         public void setsem(int sem)
         {
             semester = sem;
+        }
+        public void setpass(string pass)
+        {
+            password = pass;
+        }
+        public string getpass()
+        {
+            return password;
         }
     }
 }

@@ -56,6 +56,18 @@ namespace HMS.BL
         {
             return EmployeeDL.getallemployes();
         }
+        public static Employee VerifyEmployeeLogin(string name, string password, string requiredRole)
+        {
+            foreach (Employee e in EmployeeDL.getallemployes())
+            {
+                if (e.getname() == name && e.getpass() == password && e.getrole() == requiredRole && e.getstatus() == true)
+                {
+                    return e;
+                }
+            }
+            return null;
+        }
+
 
     }
     
