@@ -308,7 +308,7 @@ namespace HMS.UI
             if (RoomBL.roomcount() == 0)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("  [ERROR] The Admin has not entered the Rooms!");
+                Console.WriteLine("  [ERROR] The Admin has not entered any Rooms!");
                 Console.ResetColor();
                 Console.WriteLine("\n  Press any key to return to the menu...");
                 Console.ReadKey();
@@ -318,47 +318,85 @@ namespace HMS.UI
             if (StudentBL.studentcount() == 0)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("  [ERROR] There are no students to Allot.");
+                Console.WriteLine("  [ERROR] There are no students in the system.");
                 Console.ResetColor();
                 Console.WriteLine("\n  Press any key to return to the menu...");
                 Console.ReadKey();
                 return;
             }
 
-            int studentcount = StudentBL.studentcount();
-            List<Student> sortedstudents = StudentBL.sortstudentList(StudentBL.getstudentlist());
-            bool validcount = false;
-            int count = RoomBL.getroommatelimit();
-
-            while (!validcount)
+            int unassignedCount = 0;
+            foreach (Student s in StudentBL.viewallstudents())
             {
-                Console.Write("  How many Students per room : ");
-                if (int.TryParse(Console.ReadLine(), out count) && count > 0)
+                if (s.getroom() == null)
                 {
-                    RoomBL.setrommatelimit(count);
-                    validcount = true;
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("  [ERROR] Invalid input. Please enter a Valid number.\n");
-                    Console.ResetColor();
+                    unassignedCount++;
                 }
             }
 
-            int totalCapacity = Room.roomcount * count;
-            if (totalCapacity < studentcount)
+            if (unassignedCount == 0)
             {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"\n  [WARNING] Rooms are less than students. {studentcount - totalCapacity} will not get a room.");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("  [STATUS] All registered students already have rooms allocated.");
                 Console.ResetColor();
-                Console.WriteLine("  Press Enter to Continue...");
+                Console.WriteLine("\n  Press any key to return to the menu...");
                 Console.ReadKey();
+                return;
             }
-            StudentBL.addstudntsbatch(count, studentcount);
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("\n  [SUCCESS] Allocation process completed!");
+
+            int availableBeds = 0;
+            int currentLimit = RoomBL.getroommatelimit();
+
+            foreach (Room r in RoomBL.getallrooms())
+            {
+                int occupants = 0;
+                if (r.getroommates() != null)
+                {
+                    occupants = r.getroommates().Count;
+                }
+
+                if (currentLimit > occupants)
+                {
+                    availableBeds += (currentLimit - occupants);
+                }
+            }
+
+            if (availableBeds == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("  [ERROR] The hostel is currently at maximum capacity. No beds available.");
+                Console.ResetColor();
+                Console.WriteLine("\n  Press any key to return to the menu...");
+                Console.ReadKey();
+                return;
+            }
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"  --- Allocation Overview ---");
             Console.ResetColor();
+            Console.WriteLine($"  Students waiting for rooms : {unassignedCount}");
+            Console.WriteLine($"  Total available beds       : {availableBeds}");
+
+            if (unassignedCount > availableBeds)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"\n  [WARNING] Rooms are less than students. {unassignedCount - availableBeds} student(s) will not get a room.");
+                Console.ResetColor();
+            }
+
+            Console.Write("\n  Press Enter to process batch allocation...");
+            Console.ReadLine();
+
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine("  Processing allocation...");
+            Console.ResetColor();
+
+            StudentBL.addstudntsbatch(currentLimit, unassignedCount);
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("\n  [SUCCESS] Batch allocation process completed successfully!");
+            Console.ResetColor();
+
             Console.WriteLine("\n  Press any key to return to the menu...");
             Console.ReadKey();
         }
@@ -390,18 +428,57 @@ namespace HMS.UI
                 }
             }
 
-
             for (int i = 1; i <= studentCount; i++)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine($"\n  --- Entering details for Student {i} of {studentCount} ---");
                 Console.ResetColor();
 
-                Console.Write("  Registration Number (e.g., 2024-CS-101): ");
-                string regNum = Console.ReadLine();
+                string regNum = "";
+                bool validReg = false;
 
-                Console.Write("  Full Name: ");
-                string name = Console.ReadLine();
+                while (!validReg)
+                {
+                    Console.Write("  Registration Number (e.g., 2024-CS-101): ");
+                    regNum = Console.ReadLine();
+
+                    if (string.IsNullOrWhiteSpace(regNum))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("  [ERROR] Registration Number cannot be empty.\n");
+                        Console.ResetColor();
+                    }
+                    else if (StudentBL.studentexist(regNum) != null)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"  [ERROR] Student Already exists with registration '{regNum}'!\n");
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        validReg = true;
+                    }
+                }
+
+                string name = "";
+                bool validName = false;
+
+                while (!validName)
+                {
+                    Console.Write("  Full Name: ");
+                    name = Console.ReadLine();
+
+                    if (ValidationBL.IsValidName(name))
+                    {
+                        validName = true;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("  [ERROR] Invalid name. Please use only letters and spaces.\n");
+                        Console.ResetColor();
+                    }
+                }
 
                 int semester = 0;
                 bool validSem = false;
@@ -418,10 +495,11 @@ namespace HMS.UI
                     else
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("  [ERROR] Invalid semester. Please enter a number between 1 and 8.");
+                        Console.WriteLine("  [ERROR] Invalid semester. Please enter a number between 1 and 8.\n");
                         Console.ResetColor();
                     }
                 }
+
                 StudentBL.addsinglestudent(regNum, name, semester);
             }
 

@@ -9,7 +9,15 @@ namespace HMS.DL
 {
     class RequestDL
     {
-        public static List<Request> Requests = new List<Request>();
+        private static List<Request> Requests = new List<Request>();
+        public static List<Request> getRequests()
+        {
+            return Requests;
+        }
+        public static void AddRequests(Request r)
+        {
+            Requests.Add(r);
+        }
         public static void removerequest(Request r)
         {
             Requests.Remove(r);

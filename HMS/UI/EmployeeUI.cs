@@ -160,27 +160,40 @@ namespace HMS.UI
             Console.ResetColor();
 
             string regNum = "";
-            while (string.IsNullOrWhiteSpace(regNum))
+            bool validReg = false;
+
+            while (!validReg)
             {
                 Console.Write("  Registration Number (e.g., 2024-CS-101): ");
                 regNum = Console.ReadLine();
+
                 if (string.IsNullOrWhiteSpace(regNum))
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("  [ERROR] Registration Number cannot be empty.\n");
                     Console.ResetColor();
                 }
+                else if (StudentBL.studentexist(regNum) != null)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"  [ERROR] Student already exists with registration '{regNum}'!\n");
+                    Console.ResetColor();
+                }
+                else
+                {
+                    validReg = true;
+                }
             }
 
             string name = "";
-            while (string.IsNullOrWhiteSpace(name))
+            while (!ValidationBL.IsValidName(name))
             {
                 Console.Write("  Full Name: ");
                 name = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(name))
+                if (!ValidationBL.IsValidName(name))
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("  [ERROR] Name cannot be empty.\n");
+                    Console.WriteLine("  [ERROR] Name cannot be empty OR Contain Number or Special character.\n");
                     Console.ResetColor();
                 }
             }
@@ -578,7 +591,7 @@ namespace HMS.UI
                             }
                             else if(reqtype == "Roomchange")
                             {
-                                RoomBL.changeroom(reqostor, r.gettargetroom(), room);
+                                RoomBL.changeroom(reqostor, r.gettargetroom());
                             }
                             RequestBL.updatestatus(r, "Resolved");
                             Console.ForegroundColor = ConsoleColor.Green;
@@ -831,6 +844,16 @@ namespace HMS.UI
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("\n  [ERROR] The student does not exist!");
+                Console.ResetColor();
+                Console.WriteLine("\n  Press any key to return to the menu...");
+                Console.ReadKey();
+                return;
+            }
+            if (s.getroom() != null)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"\n  [ERROR] Student is already allocated to Room {s.getroom().getroomnum()}!");
+                Console.WriteLine("  If you wish to move them, please process a Check-Out or Room Change request.");
                 Console.ResetColor();
                 Console.WriteLine("\n  Press any key to return to the menu...");
                 Console.ReadKey();

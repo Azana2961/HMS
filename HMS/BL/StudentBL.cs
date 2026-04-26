@@ -54,7 +54,7 @@ namespace HMS.BL {
         }
         public static void addinglestudent(Student s, Room r)
         {
-            s.setroom(null);
+            s.setroom(r);
             r.addroommate(s);
         }
         public static int studentcount()

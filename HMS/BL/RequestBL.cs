@@ -13,25 +13,25 @@ namespace HMS.BL
         public static void requestroomchange(Student s, string r, int troom)
         {
             Request newrequest = new Request(s, r, troom, "Roomchange");
-            RequestDL.Requests.Add(newrequest);
+            RequestDL.AddRequests(newrequest);
         }
         public static void addvacaterequest(Student s, string r)
         {
             Request newrequest = new Request(s, r, "Vacante");
-            RequestDL.Requests.Add(newrequest);
+            RequestDL.AddRequests(newrequest);
         }
         public static void genralcomplain(Student s, string r)
         {
             Request newrequest = new Request(s, r, "General");
-            RequestDL.Requests.Add(newrequest);
+            RequestDL.AddRequests(newrequest);
         }
         public static List<Request> getallrequests()
         {
-            return RequestDL.Requests;
+            return RequestDL.getRequests();
         }
         public static Request Requestexist(int id)
         {
-            foreach(Request r in RequestDL.Requests)
+            foreach(Request r in RequestDL.getRequests())
             {
                 if(r.getrequestid()== id)
                 {
@@ -46,12 +46,15 @@ namespace HMS.BL
         }
         public static void removerequestbystudent(Student s)
         {
-            foreach(Request r in RequestDL.Requests)
+            List<Request> allrequests = RequestDL.getRequests();
+            for (int i = allrequests.Count - 1; i >= 0; i--)
             {
+                Request r = allrequests[i];
                 Student stu = r.getrequestor();
-                if(stu.getid() == s.getid())
+
+                if (stu.getid() == s.getid())
                 {
-                    RequestDL.removerequest(r);
+                 RequestDL.removerequest(r);
                 }
             }
         }
